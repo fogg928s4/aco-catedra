@@ -1,4 +1,4 @@
-// Librerias
+// Librerias, deben de importarse
 #include <LiquidCrystal.h>
 #include <Servo.h>
 #include <Remote.h>
