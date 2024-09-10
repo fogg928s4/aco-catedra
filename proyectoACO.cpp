@@ -1,8 +1,8 @@
 // Librerias
 #include <LiquidCrystal.h>
 #include <Servo.h>
-#include <Remote.h>
-#include <DHT.h>
+#include <IRremote.h>
+//#include <DHT.h>
 
 
 //Realmente todo esto podria ser un #define pero es lo que hay
@@ -54,7 +54,7 @@ void setup() {
     pinMode(ledPin, OUTPUT);
 
     lcd.begin(16,2);
-    IrReceiver.being(IRPin);
+    IrReceiver.begin(IRPin);
     Serial.begin(9600);
 
 }
@@ -62,11 +62,11 @@ void setup() {
 /**********************  LEDS   **********************/
 //nocturnas
 void encenderLED() {
-    digital.Write(ledPin, HIGH);
+    digitalWrite(ledPin, HIGH);
     Serial.println("Luces noturnas / de calefaccion ON");
 }
 void apagarLED() {
-    digital.Write(ledPin, LOW);
+    digitalWrite(ledPin, LOW);
     Serial.println("Luces noturnas / de calefaccion OFF");
 
 }
@@ -75,30 +75,30 @@ void apagarLED() {
 void checkError() {
     //@TODO: arreglar esto para el chile
     if (humedad > 75 ){
-        digital.Write(ledErHPin, HIGH);
+        digitalWrite(ledErrHPin, HIGH);
         Serial.println("Error de humedad. Humedad excesiva");
     }
     else {
-        digital.Write(ledErHPin, LOW);
+        digitalWrite(ledErrHPin, LOW);
         Serial.println("Humedad OK");
     }
 
     // checa la temperatura ok
     if (temperatura > 30 ){
-        digital.Write(ledErTPin, HIGH);
+        digitalWrite(ledErrTPin, HIGH);
         Serial.println("Error de temperatura. temperatura excesiva");
     }
     else {
-        digital.Write(ledErTPin, LOW);
+        digitalWrite(ledErrTPin, LOW);
         Serial.println("Temperatura OK");
     }
     //a ver si hay suficiente agua
     if(!aguaSufi) {
-        digital.Write(ledErAPin, HIGH);
+        digitalWrite(ledErrAPin, HIGH);
         Serial.println("Error de agua, insuficiente");
     }
     else {
-        digital.Write(ledErTPin, LOW);
+        digitalWrite(ledErrTPin, LOW);
         Serial.println("Suficiente Agua OK");
     }
 
@@ -106,11 +106,11 @@ void checkError() {
 
 /**********************  Ventiladores   **********************/
 void fanON() {
-    digital.Write(fanPin, HIGH);
+    digitalWrite(fanPin, HIGH);
     Serial.println("Ventilador ON");
 }
 void fanOFF() {
-    digital.Write(fanPin, LOW);
+    digitalWrite(fanPin, LOW);
     Serial.println("Ventilador OFF");
 }
 
@@ -221,7 +221,7 @@ int leerIR(unsigned long codigo) { //lee un codigo recibido
         default: //muestra un mensaje
             lcd.clear();
             lcd.setCursor(0,0);
-            lcd.print("Sin funcion")
+            lcd.print("Sin funcion");
             delay(1500);
             boton = -1;
             break;
@@ -234,8 +234,8 @@ int leerIR(unsigned long codigo) { //lee un codigo recibido
 void manual() {
     Serial.println("MODO MANUAL");
     //Lectura senal IR
-    if(IrReceiver.decor()) {
-        boton = leerIR(IrReceiver.decodedIRData.decodeRawData);
+    if(IrReceiver.decode()) {
+        boton = leerIR(IrReceiver.decodedIRData.decodedRawData);
         Serial.println("Botoon marcado: " + boton);
         Serial.flush();
         delay(1000);
@@ -270,19 +270,23 @@ void loop(){
     //lectura humedad
     humedad = analogRead(humPin);
     humedad /= 8.7;
-    Serial.println("Humedad: " + humedad + " %");
+    Serial.print("Humedad: ");
+    Serial.print(humedad);
+    Serial.print(" %");
     delay(1000);
 
     //lectura iluminacion
     luz = analogRead(LDRPin);
-    Serial.println("Luminosidad: " + luz )
+    Serial.println("Luminosidad: " + luz );
     delay(1000);
 
     //lectura temperatura no se cual es ambas datasheets dicen algo distinto
     temperatura = (analogRead(tempPin) - 20)* 3.04;
     //temperatura = (analogRead(tempPin) - 500) / 100;
     //temperatura = (analogRead(tempPin) / 9.31;
-    Serial.println("Temperatura: " + temperatura + " C")
+    Serial.print("Temperatura: ");
+    Serial.print(temperatura);
+    Serial.print(" C");
 
     //lectura potenciometro
     potencia = analogRead(potenPin);
@@ -296,16 +300,16 @@ void loop(){
     //@TODO LIberen este switch de su miseria
     switch(eleccionMsg) {
         case 0:
-            mensaje1();
+            message1();
             break;
         case 1:
-            mensaje2();
+            message2();
             break;
         case 2:
-            mensaje3();
+            message3();
             break;
         case 3:
-            mensaje4();
+            message4();
             break;
         case 4:
         //@TODO dios que es estooooo alguien saquelo de aquiiii
@@ -317,7 +321,7 @@ void loop(){
                 !manualMode;
                 Serial.print("Cambiado a manual: modoManual = " + manualMode);
             }
-            mensaje5();
+            message5();
             break;
         default:
             break;
