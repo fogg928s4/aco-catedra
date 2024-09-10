@@ -290,6 +290,6 @@ void loop(){
             break;
     }
     delay(1000);
-    
+    //now the manual mode
 
 }
