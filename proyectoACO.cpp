@@ -230,6 +230,39 @@ int leerIR(unsigned long codigo) { //lee un codigo recibido
     return boton;
 }
 
+/**********************MODOS ********************** */
+void manual() {
+    Serial.println("MODO MANUAL");
+    //Lectura senal IR
+    if(IrReceiver.decor()) {
+        boton = leerIR(IrReceiver.decodedIRData.decodeRawData);
+        Serial.println("Botoon marcado: " + boton);
+        Serial.flush();
+        delay(1000);
+        IrReceiver.resume();
+    }
+}
+void automatic() {
+    Serial.println("MODO AUTOMATICO");
+    //mucho calor
+    if(temperatura > 30) {
+        fanON();
+        if(!winOpen) abrirWin(); //si la temperatura es muy alta
+    }
+    else {
+        fanOFF();
+        if(winOpen) cerrarWin();
+    }
+    delay(1000);
+
+    //control luzy muito frio
+    if(luz<100 || temperatura< 10)
+        encenderLED();
+    else
+        apagarLED();
+    delay(1001);
+
+}
 
 /**********************  AHORA SI LO BUENO   **********************/
 
@@ -290,6 +323,13 @@ void loop(){
             break;
     }
     delay(1000);
-    //now the manual mode
+    //now the manual mode or automatic
+    if(manualMode)
+        manual();
+    else
+        automatic();
 
+    //comprobar errores
+    checkError();
+    delay(1002);
 }
