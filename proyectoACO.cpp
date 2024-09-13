@@ -93,7 +93,7 @@ void checkError() {
         Serial.println("Temperatura OK");
     }
     //a ver si hay suficiente agua
-    if(!aguaSufi) {
+    if(aguaSufi == false) {
         digitalWrite(ledErrAPin, HIGH);
         Serial.println("Error de agua, insuficiente");
     }
@@ -247,11 +247,11 @@ void automatic() {
     //mucho calor
     if(temperatura > 30) {
         fanON();
-        if(!winOpen) abrirWin(); //si la temperatura es muy alta
+        if(winOpen == false) abrirWin(); //si la temperatura es muy alta
     }
     else {
         fanOFF();
-        if(winOpen) cerrarWin();
+        if(winOpen == true) cerrarWin();
     }
     delay(1000);
 
@@ -313,8 +313,8 @@ void loop(){
             break;
         case 4:
         //@TODO dios que es estooooo alguien saquelo de aquiiii
-            if(manualMode){
-                !manualMode;
+            if(manualMode == true){
+                !manualMode; //if true ofc itll turn it into false
                 Serial.print("Cambiado automatico: modoManual = " + manualMode);
             }
             else {
@@ -328,7 +328,7 @@ void loop(){
     }
     delay(1000);
     //now the manual mode or automatic
-    if(manualMode)
+    if(manualMode == true)
         manual();
     else
         automatic();
