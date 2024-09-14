@@ -34,7 +34,7 @@ int boton = 0;
 float temperatura;
 
 //objetos de librerias
-#define DHTTYPE DHT11
+//#define DHTTYPE DHT11
 
 //EN EL 74hc595 
 //data 2, clock 4, latch 3
