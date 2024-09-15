@@ -265,7 +265,7 @@ void automatic() {
 }
 
 /**********************  AHORA SI LO BUENO   **********************/
-
+// :P
 void loop(){
     //lectura humedad
     humedad = analogRead(humPin);
