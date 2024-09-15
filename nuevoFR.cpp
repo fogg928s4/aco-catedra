@@ -37,7 +37,7 @@ Servo servoEng; //Objeto para el servo motor
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
 //Servo servo_9;
 
-bool automatico = true;
+bool automatico = false;
 bool isLED = false;
 bool isFan = false;
 bool isBomb = false;
@@ -257,19 +257,36 @@ void hacer() {
 
     if(temperatura > 30){
         Serial.println("Temperatura elevada, activando ventilador");
-        Serial.println("Temperatura elevada, abriendo ventana");
         // Activar el ventilador durante 2 segundos
         isFan = false;
-        isWindow = false;
-      	turnWindow();
         turnFAN();
         delay(5000);
         turnFAN();
-      	turnWindow();
         delay(100);
 	}
   	else    
         Serial.println("Temperatura adecuada");
+}
+
+//Modo automatico del sistema
+void autoMODE() {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("MODO AUTO: ");
+    lcd.setCursor(0,1);
+    Serial.print("Modo automatico: ");
+    if (automatico == true) {
+        lcd.print("ON");
+        Serial.println("ENCENDIDO");
+        hacer();
+        delay(1500);
+        IrReceiver.resume();
+        autoMODE();
+    }
+    else {
+        lcd.print("OFF");
+        Serial.println("APAGADO");
+    }
 }
 
 void errorKey() {
@@ -329,32 +346,31 @@ void loop() {
                 showLCD();
                 break;
             case Tecla_7: // modo automatico on/off
-          		automatico = true;
-                IrReceiver.resume();
-          		lcd.setCursor(0,0);
-          		lcd.print(" AUTOMODE ON");
-          		delay(2000);
-          		lcd.clear();
-      	    	while(automatico) {
-                    hacer();
-                    delay(1000);
-                    if (IrReceiver.decode()) {
-                        if (IrReceiver.decodedIRData.decodedRawData == Tecla_7) {
-                            automatico = false;
-                          	lcd.setCursor(0,0);
-          		    		lcd.print(" AUTOMODE OFF");
-                          	delay(2000);
-          		    		lcd.clear();
-                            Serial.println("Ha salido del modo automatico");
-                        }
-                    }
-                    IrReceiver.resume();
-      	        }
+                automatico = !automatico;
+                autoMODE();
                 break;
             default:
                 errorKey();
-                break; 
+                break;
+            
+            
         }
+        //al presionar el boton 7 inicia el modo auto
+      /** if (IrReceiver.decodedIRData.decodedRawData == Tecla_7) {
+            IrReceiver.resume();
+            
+      	    while(automatico) {
+                hacer();
+                delay(1000);
+                if (IrReceiver.decode()) {
+                    if (IrReceiver.decodedIRData.decodedRawData == Tecla_7) {
+                        automatico = false;
+                        Serial.println("entra aqui");
+                    }
+                }
+                IrReceiver.resume();
+      	    }
+        } 	*/
         IrReceiver.resume();
     }
 }
